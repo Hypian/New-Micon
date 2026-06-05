@@ -1,15 +1,15 @@
-"use strict";
-// ─── MICON REAL LINE — main.ts ───────────────────────────────────────────────
+// ─── MICON REAL LINE — main.js ───────────────────────────────────────────────
 // Navbar scroll behaviour
 const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
+if (navbar) {
+  window.addEventListener('scroll', () => {
     if (window.scrollY > 40) {
-        navbar.classList.add('scrolled');
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
     }
-    else {
-        navbar.classList.remove('scrolled');
-    }
-}, { passive: true });
+  }, { passive: true });
+}
 // Smooth scroll for nav links
 document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', (e) => {
@@ -33,13 +33,13 @@ function closeMobileMenu() {
     document.body.style.overflow = '';
 }
 hamburger?.addEventListener('click', () => {
-    const isOpen = mobileMenu.classList.contains('open');
+    const isOpen = mobileMenu?.classList.contains('open');
     if (isOpen) {
         closeMobileMenu();
     }
     else {
         hamburger.classList.add('open');
-        mobileMenu.classList.add('open');
+        mobileMenu?.classList.add('open');
         document.body.style.overflow = 'hidden';
     }
 });
@@ -203,36 +203,22 @@ const videoCards = document.querySelectorAll('.video-card');
 videoCards.forEach(card => {
     const video = card.querySelector('video');
     if (!video) return;
-
-    // Switch preload from "none" to "metadata" so the browser is ready to play
     video.preload = 'auto';
-
-    // Hover: play / pause
     card.addEventListener('mouseenter', () => { video.play().catch(() => {}); });
     card.addEventListener('mouseleave', () => {
-        // Only pause on mouse-leave if the card is still visible (don't fight the scroll observer)
         if (!card.classList.contains('in-view')) video.pause();
     });
-
-    // Scroll: play when 20% of the card enters the viewport, pause when it fully leaves
     const scrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 card.classList.add('in-view');
-                // Small delay lets the browser finish any pending decode before play()
-                setTimeout(() => {
-                    video.play().catch(() => {});
-                }, 100);
+                setTimeout(() => { video.play().catch(() => {}); }, 100);
             } else {
                 card.classList.remove('in-view');
                 video.pause();
             }
         });
-    }, {
-        threshold: 0.2,       // trigger when 20% of the card is visible
-        rootMargin: '0px'     // no extra margin — fires exactly at viewport edge
-    });
-
+    }, { threshold: 0.2 });
     scrollObserver.observe(card);
 });
 // ─── HERO PARALLAX ────────────────────────────────────────────────────────────
@@ -243,3 +229,23 @@ window.addEventListener('scroll', () => {
     const scrolled = window.scrollY;
     heroVideo.style.transform = `translateY(${scrolled * 0.3}px)`;
 }, { passive: true });
+
+// ─── ACTIVE NAV LINK ON SCROLL ───────────────────────────────────────────────
+const sections = ['hero','about','services','lineads','clients','cta','contact'];
+const menuLinks = document.querySelectorAll('.menu a');
+
+function updateActiveLink() {
+  const scrollY = window.scrollY + 120;
+  let current = 'hero';
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= scrollY) current = id;
+  });
+  menuLinks.forEach(link => {
+    const href = link.getAttribute('href');
+    link.classList.toggle('active', href === '#' + current);
+  });
+}
+
+window.addEventListener('scroll', updateActiveLink, { passive: true });
+updateActiveLink();
