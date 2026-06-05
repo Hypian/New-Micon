@@ -1503,6 +1503,18 @@ section { padding: 96px 24px; }
   .hero-headline { font-size: clamp(28px, 13vw, 40px); }
   .hero-sub { font-size: 13px; }
   .badge { font-size: 10px; padding: 4px 10px; }
+  
+  /* Outdoor metrics bar - stack vertically on mobile */
+  #outdoor .section-inner > div:last-of-type {
+    grid-template-columns: 1fr !important;
+  }
+  #outdoor .section-inner > div:last-of-type > div {
+    padding: 20px 16px !important;
+  }
+  #outdoor .section-inner > div:last-of-type > div > div:first-child {
+    font-size: 24px !important;
+  }
+  
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 0;
