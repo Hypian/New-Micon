@@ -1466,6 +1466,50 @@ section { padding: 96px 24px; }
   .dashboard-mockup { padding: 0; }
   .reveal-left, .reveal-right { transform: translateY(20px) !important; }
   .reveal-left.visible, .reveal-right.visible { transform: translateY(0) !important; }
+
+  /* Mobile fix: prevent "We are" text collision - make inline */
+  .legendary-card {
+    padding: 20px 16px !important;
+  }
+  .legendary-card .loader {
+    font-size: 16px !important;
+    height: auto !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    margin-bottom: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+  .legendary-card .loader p {
+    font-size: 16px !important;
+    line-height: 28px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+  }
+  .legendary-card .words {
+    display: inline-block !important;
+    width: auto !important;
+    min-width: 120px !important;
+    height: 28px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    vertical-align: bottom !important;
+  }
+  .legendary-card .words::after {
+    background: linear-gradient(var(--bg-color) 10%, transparent 25%, transparent 75%, var(--bg-color) 90%) !important;
+  }
+  .legendary-card .word {
+    line-height: 28px !important;
+    font-size: 16px !important;
+    height: 28px !important;
+  }
+  .legendary-desc {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    margin-top: 8px !important;
+  }
 }
 
 @media (max-width: 600px) {
