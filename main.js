@@ -212,6 +212,7 @@ videoCards.forEach(card => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 card.classList.add('in-view');
+                video.currentTime = 0;
                 setTimeout(() => { video.play().catch(() => {}); }, 100);
             } else {
                 card.classList.remove('in-view');
