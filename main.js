@@ -198,13 +198,31 @@ contactForm?.addEventListener('submit', async (e) => {
 const style = document.createElement('style');
 style.textContent = `.spin { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }`;
 document.head.appendChild(style);
-// ─── VIDEO AUTOPLAY ON SCROLL ─────────────────────────────────────────────────
+// ─── VIDEO LAZY LOAD & AUTOPLAY ON SCROLL ─────────────────────────────────────
 const videoCards = document.querySelectorAll('.video-card');
 videoCards.forEach(card => {
     const video = card.querySelector('video');
     if (!video) return;
-    video.preload = 'auto';
-    card.addEventListener('mouseenter', () => { video.play().catch(() => {}); });
+    const source = video.querySelector('source');
+    const lazySrc = source ? source.getAttribute('src') : video.getAttribute('src');
+    let loaded = false;
+
+    function lazyLoadVideo() {
+        if (loaded || !lazySrc) return;
+        // Only set src when needed (lazy load)
+        if (source && !video.getAttribute('src')) {
+            // source element already has src, just load
+        } else if (!source) {
+            video.src = lazySrc;
+        }
+        video.load();
+        loaded = true;
+    }
+
+    card.addEventListener('mouseenter', () => {
+        lazyLoadVideo();
+        video.play().catch(() => {});
+    });
     card.addEventListener('mouseleave', () => {
         if (!card.classList.contains('in-view')) video.pause();
     });
@@ -212,14 +230,15 @@ videoCards.forEach(card => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 card.classList.add('in-view');
+                lazyLoadVideo();
                 video.currentTime = 0;
-                setTimeout(() => { video.play().catch(() => {}); }, 100);
+                setTimeout(() => { video.play().catch(() => {}); }, 150);
             } else {
                 card.classList.remove('in-view');
                 video.pause();
             }
         });
-    }, { threshold: 0.2 });
+    }, { threshold: 0.15, rootMargin: '200px 0px' });
     scrollObserver.observe(card);
 });
 // ─── HERO PARALLAX ────────────────────────────────────────────────────────────

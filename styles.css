@@ -225,10 +225,24 @@ h1, h2, h3, h4, h5 {
   width: 100%; height: 100%;
   object-fit: cover;
   z-index: 0;
+  will-change: transform;
+  transform: translateZ(0);
 
   /* On some mobile browsers a play UI can appear for videos.
      Keep it hidden since this video is decorative + muted. */
   pointer-events: none;
+}
+
+/* GPU-accelerate showcase video cards for smooth playback */
+.video-card video {
+  will-change: contents;
+  transform: translateZ(0);
+}
+
+/* Defer rendering of off-screen sections to speed up initial paint */
+#services, #lineads, #clients, #cta, #contact, #footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
 }
 
 
@@ -236,9 +250,9 @@ h1, h2, h3, h4, h5 {
   position: absolute; inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(107,33,168,0.88) 0%,
-    rgba(15,23,42,0.72) 45%,
-    rgba(236,30,107,0.5) 100%
+    #581c87 0%, /* Opaque purple-900 */
+    #0f172a 45%, /* Opaque slate-900 */
+    #be123c 100% /* Opaque rose-700 */
   );
   z-index: 1;
 }
@@ -260,14 +274,77 @@ h1, h2, h3, h4, h5 {
   margin: 0 auto;
   padding: 0 24px;
   width: 100%;
-  text-align: center;
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 100vh;
+  padding-top: 100px;
+  padding-bottom: 80px;
+  gap: 60px;
+  padding-left: 72px;
+}
+
+
+.hero-content-left {
+  flex: 1;
+  max-width: 55%;
+}
+
+.hero-content-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-placeholder-asset {
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 1 / 1;
+  background: rgba(255,255,255,0.03);
+  border: 2px dashed rgba(255,255,255,0.15);
+  border-radius: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding-top: 100px;
-  padding-bottom: 80px;
+  color: var(--text-faint);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
+}
+
+.hero-placeholder-asset:hover {
+  border-color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.06);
+}
+
+@media (max-width: 992px) {
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    padding-top: 140px;
+    gap: 40px;
+  }
+  .hero-content-left {
+    max-width: 100%;
+  }
+  .hero-headline, .hero-sub {
+    text-align: center;
+  }
+  .hero-sub {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero-btns {
+    justify-content: center !important;
+  }
 }
 
 .badge {
@@ -308,7 +385,7 @@ h1, h2, h3, h4, h5 {
   letter-spacing: -0.05em;
   margin-bottom: 24px;
   overflow: hidden;
-  text-align: center;
+  text-align: left;
   color: white;
   filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.4));
 }
@@ -341,10 +418,10 @@ h1, h2, h3, h4, h5 {
   font-weight: 400;
   color: rgba(255,255,255,0.9);
   line-height: 1.6;
-  margin: 0 auto 44px;
+  margin: 0 0 44px 0;
   opacity: 0;
   animation: fade-in 1s ease 0.6s forwards;
-  text-align: center;
+  text-align: left;
   text-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
@@ -746,9 +823,12 @@ section { padding: 96px 24px; }
   height: 36px;
   padding: 8px 0;
   display: flex;
+  align-items: baseline;
+  line-height: 36px;
   border-radius: 8px;
+  overflow: hidden;
 }
-.legendary-card .words { overflow: hidden; position: relative; }
+.legendary-card .words { overflow: hidden; position: relative; height: 36px; }
 .legendary-card .words::after {
   content: '';
   position: absolute;
@@ -1107,6 +1187,17 @@ section { padding: 96px 24px; }
   line-height: 1.4;
 }
 .client-logo-cell:hover .client-logo-text { color: var(--purple); }
+.client-logo-img {
+  max-width: 180px;
+  max-height: 80px;
+  width: 100%;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+.client-logo-cell:hover .client-logo-img {
+  transform: scale(1.05);
+}
+
 
 .clients-stats {
   display: grid;
@@ -1271,6 +1362,7 @@ section { padding: 96px 24px; }
   color: var(--text-muted);
   text-decoration: none;
   transition: all 0.25s;
+  position: relative;
 }
 .social-btn:hover {
   color: white;
@@ -1278,6 +1370,40 @@ section { padding: 96px 24px; }
   background: var(--grad-brand);
   transform: translateY(-3px);
   box-shadow: var(--shadow-brand);
+}
+
+/* Uiverse Tooltip Animation */
+.social-tooltip {
+  position: absolute;
+  top: 0;
+  font-size: 12px;
+  background: white;
+  color: #111;
+  padding: 5px 10px;
+  border-radius: 6px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.social-tooltip::before {
+  position: absolute;
+  content: "";
+  height: 8px;
+  width: 8px;
+  background: white;
+  bottom: -3px;
+  left: 50%;
+  transform: translate(-50%) rotate(45deg);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.social-btn:hover .social-tooltip {
+  top: -45px;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .contact-form { display: flex; flex-direction: column; gap: 16px; }
@@ -1637,4 +1763,210 @@ section { padding: 96px 24px; }
   }
   html { scroll-behavior: auto; }
   .btn-primary, .btn-secondary, .menu { animation: none; }
+}
+
+
+
+/* From Uiverse.io by marcelodolza */
+.btn-primary, .btn-secondary, .btn-submit {
+  --primary: #ffffff; /* For text hover effect */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+/* Ensure inner elements inherit the button's text color (white) */
+.state p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: inherit; 
+}
+
+.state .icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  transform: scale(1.25);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.state .icon svg {
+  overflow: visible;
+}
+
+/* Outline Animation */
+.outline {
+  position: absolute;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  inset: -2px -3.5px;
+  pointer-events: none;
+}
+
+.outline::before {
+  content: "";
+  position: absolute;
+  inset: -100%;
+  background: conic-gradient(
+    from 180deg,
+    transparent 60%,
+    rgba(255,255,255,0.8) 80%,
+    transparent 100%
+  );
+  animation: spin 2s linear infinite;
+  animation-play-state: paused;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.btn-primary:hover .outline, .btn-secondary:hover .outline, .btn-submit:hover .outline {
+  opacity: 1;
+}
+
+.btn-primary:hover .outline::before, .btn-secondary:hover .outline::before, .btn-submit:hover .outline::before {
+  animation-play-state: running;
+}
+
+/* Letters Animation */
+.state p span {
+  display: block;
+  opacity: 0;
+  animation: slideDown 0.8s ease forwards calc(var(--i) * 0.03s);
+}
+
+.btn-primary:hover p span, .btn-secondary:hover p span, .btn-submit:hover p span {
+  opacity: 1;
+  animation: wave 0.5s ease forwards calc(var(--i) * 0.02s);
+}
+
+.btn-primary:focus p span, .btn-secondary:focus p span, .btn-submit:focus p span {
+  opacity: 1;
+  animation: disapear 0.6s ease forwards calc(var(--i) * 0.03s);
+}
+
+@keyframes wave {
+  30% { opacity: 1; transform: translateY(4px) translateX(0) rotate(0); }
+  50% { opacity: 1; transform: translateY(-3px) translateX(0) rotate(0); color: var(--primary); }
+  100% { opacity: 1; transform: translateY(0) translateX(0) rotate(0); }
+}
+
+@keyframes slideDown {
+  0% { opacity: 0; transform: translateY(-20px) translateX(5px) rotate(-90deg); color: var(--primary); filter: blur(5px); }
+  30% { opacity: 1; transform: translateY(4px) translateX(0) rotate(0); filter: blur(0); }
+  50% { opacity: 1; transform: translateY(-3px) translateX(0) rotate(0); }
+  100% { opacity: 1; transform: translateY(0) translateX(0) rotate(0); }
+}
+
+@keyframes disapear {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateX(5px) translateY(20px); color: var(--primary); filter: blur(5px); }
+}
+
+/* Icon Fly Animation */
+.state--default .icon svg {
+  animation: land 0.6s ease forwards;
+}
+
+.btn-primary:hover .state--default .icon, .btn-secondary:hover .state--default .icon, .btn-submit:hover .state--default .icon {
+  transform: rotate(45deg) scale(1.25);
+}
+
+.btn-primary:focus .state--default svg, .btn-secondary:focus .state--default svg, .btn-submit:focus .state--default svg {
+  animation: takeOff 0.8s linear forwards;
+}
+
+.btn-primary:focus .state--default .icon, .btn-secondary:focus .state--default .icon, .btn-submit:focus .state--default .icon {
+  transform: rotate(0) scale(1.25);
+}
+
+@keyframes takeOff {
+  0% { opacity: 1; }
+  60% { opacity: 1; transform: translateX(70px) rotate(45deg) scale(2); }
+  100% { opacity: 0; transform: translateX(160px) rotate(45deg) scale(0); }
+}
+
+@keyframes land {
+  0% { transform: translateX(-60px) translateY(30px) rotate(-50deg) scale(2); opacity: 0; filter: blur(3px); }
+  100% { transform: translateX(0) translateY(0) rotate(0); opacity: 1; filter: blur(0); }
+}
+
+/* Contrail */
+.state--default .icon:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  width: 0;
+  left: -5px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5));
+}
+
+.btn-primary:focus .state--default .icon:before, .btn-secondary:focus .state--default .icon:before, .btn-submit:focus .state--default .icon:before {
+  animation: contrail 0.8s linear forwards;
+}
+
+@keyframes contrail {
+  0% { width: 0; opacity: 1; }
+  8% { width: 15px; }
+  60% { opacity: 0.7; width: 80px; }
+  100% { opacity: 0; width: 160px; }
+}
+
+/* States */
+.state {
+  padding-left: 29px;
+  z-index: 2;
+  display: flex;
+  position: relative;
+}
+
+.state--sent {
+  display: none;
+}
+
+.state--sent svg {
+  transform: scale(1.25);
+  margin-right: 8px;
+}
+
+.btn-primary:focus .state--default, .btn-secondary:focus .state--default, .btn-submit:focus .state--default {
+  position: absolute;
+}
+
+.btn-primary:focus .state--sent, .btn-secondary:focus .state--sent, .btn-submit:focus .state--sent {
+  display: flex;
+}
+
+.btn-primary:focus .state--sent span, .btn-secondary:focus .state--sent span, .btn-submit:focus .state--sent span {
+  opacity: 0;
+  animation: slideDown 0.8s ease forwards calc(var(--i) * 0.2s);
+}
+
+.btn-primary:focus .state--sent .icon svg, .btn-secondary:focus .state--sent .icon svg, .btn-submit:focus .state--sent .icon svg {
+  opacity: 0;
+  animation: appear 1.2s ease forwards 0.8s;
+}
+
+@keyframes appear {
+  0% { opacity: 0; transform: scale(4) rotate(-40deg); color: var(--primary); filter: blur(4px); }
+  30% { opacity: 1; transform: scale(0.6); filter: blur(1px); }
+  50% { opacity: 1; transform: scale(1.2); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1); }
 }
