@@ -269,3 +269,25 @@ function updateActiveLink() {
 
 window.addEventListener('scroll', updateActiveLink, { passive: true });
 updateActiveLink();
+
+/* ══════════════════════════════════════════════════════
+   IDLE NAV BLOB ANIMATION
+   ══════════════════════════════════════════════════════ */
+let navIdleTimeout;
+function resetNavIdleTimer() {
+  document.body.classList.remove('nav-idle');
+  clearTimeout(navIdleTimeout);
+  navIdleTimeout = setTimeout(() => {
+    document.body.classList.add('nav-idle');
+  }, 5000);
+}
+
+// Initial start
+resetNavIdleTimer();
+
+// Listeners
+window.addEventListener('mousemove', resetNavIdleTimer);
+window.addEventListener('scroll', resetNavIdleTimer, { passive: true });
+window.addEventListener('click', resetNavIdleTimer);
+window.addEventListener('keydown', resetNavIdleTimer);
+window.addEventListener('touchstart', resetNavIdleTimer, { passive: true });
