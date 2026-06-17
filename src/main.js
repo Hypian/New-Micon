@@ -352,58 +352,139 @@ function escapeHtml(str) {
   });
 }
 
-window.initLocationsMap = function initLocationsMap() {
+function initLocationsMap() {
   const el = document.getElementById('locations-map');
-  if (!el || !window.google || !window.google.maps) return;
+  if (!el || !window.L) return;
 
-  // Edit these pins (lat/lng + image) to match your real pole locations.
-  const locations = [
-    {
-      title: 'Kigali CBD',
-      position: { lat: -1.9441, lng: 30.0619 },
-      image: 'src/assets/1.jpg',
-    },
-    {
-      title: 'Kigali Heights',
-      position: { lat: -1.9536, lng: 30.0925 },
-      image: 'src/assets/2.jpg',
-    },
-    {
-      title: 'Kimironko',
-      position: { lat: -1.9366, lng: 30.1306 },
-      image: 'src/assets/3.jpg',
-    },
+  // Auto-pool images (added by you) for pin previews.
+  // Add/remove files in `src/assets/` starting with `_c5` and they'll work automatically.
+  const c5Images = [
+    'assets/_c5a1705.jpg',
+    'assets/_c5a1708.jpg',
+    'assets/_c5a1712.jpg',
+    'assets/_c5a1723.jpg',
+    'assets/_c5a1727.jpg',
+    'assets/_c5a1738.jpg',
+    'assets/_c5a1742.jpg',
+    'assets/_c5a1743.jpg',
+    'assets/_c5a1761.jpg',
+    'assets/_c5a1787.jpg',
+    'assets/_c5a1810.jpg',
+    'assets/_c5a1836.jpg',
+    'assets/_c5a1836 (1).jpg',
+    'assets/_c5a1848.jpg',
+    'assets/_c5a1867.jpg',
   ];
 
-  const map = new window.google.maps.Map(el, {
-    center: locations[0]?.position ?? { lat: -1.9441, lng: 30.0619 },
-    zoom: 12,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: true,
+  // ✅ Edit these pins (lat/lng + image) to match your real pole locations.
+  // Tip: You can copy coordinates from Google Maps by right-clicking a place.
+  const locations = [
+    // From: 1°58'54.8"S 30°06'14.7"E
+    { title: 'Pinned Location 1', lat: -1.9818889, lng: 30.1040833 },
+
+    // From: 1°58'31.7"S 30°04'25.4"E
+    { title: 'Pinned Location 2', lat: -1.9754722, lng: 30.0737222 },
+
+    // Placeholder pins around Kigali / Kicukiro (replace anytime)
+    { title: 'Kicukiro (Placeholder)', lat: -1.9709, lng: 30.1034 },
+    { title: 'Gikondo (Placeholder)', lat: -1.9882, lng: 30.0852 },
+    { title: 'Kanombe (Placeholder)', lat: -1.9647, lng: 30.1384 },
+
+    // More pins around the same area (placeholders)
+    { title: 'Kicukiro East (Placeholder)', lat: -1.9722, lng: 30.1104 },
+    { title: 'Kicukiro South (Placeholder)', lat: -1.9860, lng: 30.1068 },
+    { title: 'Sonatubes (Placeholder)', lat: -1.9844, lng: 30.0957 },
+    { title: 'Gikondo Market (Placeholder)', lat: -1.9914, lng: 30.0869 },
+    { title: 'Remera Link (Placeholder)', lat: -1.9569, lng: 30.1098 },
+    { title: 'Kibagabaga Edge (Placeholder)', lat: -1.9449, lng: 30.1178 },
+    { title: 'Kicukiro Center (Placeholder)', lat: -1.9748, lng: 30.0991 },
+    { title: 'Kagarama (Placeholder)', lat: -1.9831, lng: 30.1099 },
+    { title: 'Nyarugunga (Placeholder)', lat: -1.9632, lng: 30.1246 },
+    { title: 'Gatenga (Placeholder)', lat: -1.9996, lng: 30.1008 },
+    { title: 'Kicukiro Ridge (Placeholder)', lat: -1.9688, lng: 30.1128 },
+    { title: 'Airport Rd (Placeholder)', lat: -1.9641, lng: 30.1357 },
+    { title: 'Gahanga (Placeholder)', lat: -1.9899, lng: 30.1324 },
+    { title: 'Kigali Ring (Placeholder)', lat: -1.9716, lng: 30.0884 },
+    { title: 'Kicukiro West (Placeholder)', lat: -1.9774, lng: 30.0928 },
+
+    // Extra pins (placeholders) — add/replace with real poles
+    { title: 'Kicukiro North (Placeholder)', lat: -1.9664, lng: 30.1016 },
+    { title: 'Kicukiro South-East (Placeholder)', lat: -1.9908, lng: 30.1186 },
+    { title: 'Gikondo Junction (Placeholder)', lat: -1.9856, lng: 30.0788 },
+    { title: 'Kagarama Link (Placeholder)', lat: -1.9797, lng: 30.1148 },
+    { title: 'Kanombe North (Placeholder)', lat: -1.9568, lng: 30.1369 },
+    { title: 'Airport Approach (Placeholder)', lat: -1.9706, lng: 30.1418 },
+    { title: 'Nyarugunga South (Placeholder)', lat: -1.9759, lng: 30.1299 },
+    { title: 'Gatenga East (Placeholder)', lat: -2.0068, lng: 30.1112 },
+    { title: 'Gahanga North (Placeholder)', lat: -1.9834, lng: 30.1412 },
+    { title: 'Kicukiro Central 2 (Placeholder)', lat: -1.9729, lng: 30.0959 },
+  ];
+
+  const start = locations[0] ?? { lat: -1.9441, lng: 30.0619 };
+
+  const map = window.L.map(el, {
+    scrollWheelZoom: false,
+  }).setView([start.lat, start.lng], 12);
+
+  window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors',
+  }).addTo(map);
+
+  // Classic red pin marker (common style)
+  const redPinIcon = window.L.icon({
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+    // Note: Leaflet's default icon is blue; we override with a red icon below if available.
   });
 
-  const infoWindow = new window.google.maps.InfoWindow();
+  // Try to use a red marker asset (falls back to default if blocked).
+  const redPinIconAlt = window.L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  });
 
-  locations.forEach((loc) => {
-    const marker = new window.google.maps.Marker({
-      map,
-      position: loc.position,
-      title: loc.title,
-    });
-
-    marker.addListener('click', () => {
-      const title = escapeHtml(loc.title);
-      const imgSrc = escapeHtml(loc.image);
-      infoWindow.setContent(`
-        <div style="max-width:260px">
-          <div style="font-weight:800;margin:0 0 10px 0;color:#111827;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;">
-            ${title}
-          </div>
-          <img src="${imgSrc}" alt="${title}" style="width:100%;height:160px;object-fit:cover;border-radius:12px;border:1px solid rgba(17,24,39,0.12);" loading="lazy" />
+  locations.forEach((loc, idx) => {
+    const effectiveImage = loc.image ?? c5Images[idx % c5Images.length] ?? '';
+    const title = escapeHtml(loc.title);
+    // Ensure spaces / parentheses in filenames work in URLs.
+    const imgSrc = escapeHtml(encodeURI(effectiveImage));
+    const popupHtml = `
+      <div style="max-width:260px">
+        <div style="font-weight:800;margin:0 0 10px 0;color:#111827;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;">
+          ${title}
         </div>
-      `);
-      infoWindow.open({ map, anchor: marker });
+        <img src="${imgSrc}" alt="${title}" style="width:100%;height:160px;object-fit:cover;border-radius:12px;border:1px solid rgba(17,24,39,0.12);" loading="lazy" />
+      </div>
+    `;
+
+    const marker = window.L.marker([loc.lat, loc.lng], {
+      icon: redPinIconAlt ?? redPinIcon,
+      title: loc.title,
+    }).addTo(map).bindPopup(popupHtml, {
+      maxWidth: 280,
+      closeButton: true,
     });
+
+    // Open preview on hover and on click.
+    marker.on('mouseover', () => marker.openPopup());
+    marker.on('mouseout', () => marker.closePopup());
+    marker.on('click', () => marker.openPopup());
   });
-};
+
+  // Improve UX: enable scroll zoom after user interacts with map.
+  map.on('focus', () => map.scrollWheelZoom.enable());
+  map.on('blur', () => map.scrollWheelZoom.disable());
+  el.setAttribute('tabindex', '0');
+}
+
+// Leaflet loads after main.js (both deferred), so initialize on window load.
+window.addEventListener('load', initLocationsMap);
