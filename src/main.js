@@ -241,14 +241,55 @@ videoCards.forEach(card => {
     }, { threshold: 0.15, rootMargin: '200px 0px' });
     scrollObserver.observe(card);
 });
-// ─── HERO PARALLAX ────────────────────────────────────────────────────────────
+// ─── HERO VIDEO FADE SYSTEM ───────────────────────────────────────────────────
 const heroVideo = document.getElementById('hero-video');
-window.addEventListener('scroll', () => {
-    if (!heroVideo)
-        return;
-    const scrolled = window.scrollY;
-    heroVideo.style.transform = `translateY(${scrolled * 0.3}px)`;
-}, { passive: true });
+let heroFadeFrame = null;
+let heroOpacity = 0;
+
+function setHeroOpacity(value) {
+    heroOpacity = Math.max(0, Math.min(1, value));
+    if (heroVideo) heroVideo.style.opacity = heroOpacity.toString();
+}
+
+function cancelHeroFade() {
+    if (heroFadeFrame) {
+        cancelAnimationFrame(heroFadeFrame);
+        heroFadeFrame = null;
+    }
+}
+
+function heroFadeTo(targetOpacity, duration) {
+    cancelHeroFade();
+    const start = performance.now();
+    const initial = heroOpacity;
+    const delta = targetOpacity - initial;
+
+    function tick(now) {
+        const progress = Math.min(1, (now - start) / duration);
+        setHeroOpacity(initial + delta * progress);
+        if (progress < 1) {
+            heroFadeFrame = requestAnimationFrame(tick);
+        } else {
+            heroFadeFrame = null;
+        }
+    }
+
+    heroFadeFrame = requestAnimationFrame(tick);
+}
+
+function heroPlaySequence() {
+    if (!heroVideo) return;
+    setHeroOpacity(0);
+    heroVideo.loop = true;
+    heroVideo.play().catch(() => {});
+    heroFadeTo(1, 250);
+}
+
+if (heroVideo) {
+    heroVideo.addEventListener('loadeddata', () => {
+        heroPlaySequence();
+    });
+}
 
 // ─── ACTIVE NAV LINK ON SCROLL ───────────────────────────────────────────────
 const sections = ['hero','about','services','lineads','clients','cta','contact'];
@@ -284,6 +325,9 @@ function resetNavIdleTimer() {
 
 // Initial start
 resetNavIdleTimer();
+document.addEventListener('mousemove', resetNavIdleTimer, { passive: true });
+document.addEventListener('keydown', resetNavIdleTimer, { passive: true });
+resetNavIdleTimer();
 
 // Listeners
 window.addEventListener('mousemove', resetNavIdleTimer);
@@ -291,3 +335,75 @@ window.addEventListener('scroll', resetNavIdleTimer, { passive: true });
 window.addEventListener('click', resetNavIdleTimer);
 window.addEventListener('keydown', resetNavIdleTimer);
 window.addEventListener('touchstart', resetNavIdleTimer, { passive: true });
+
+/* ------------------------------------------------------
+   LOCATIONS MAP (Google Maps + pinned locations)
+   ------------------------------------------------------ */
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (ch) => {
+    switch (ch) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#039;';
+      default: return ch;
+    }
+  });
+}
+
+window.initLocationsMap = function initLocationsMap() {
+  const el = document.getElementById('locations-map');
+  if (!el || !window.google || !window.google.maps) return;
+
+  // Edit these pins (lat/lng + image) to match your real pole locations.
+  const locations = [
+    {
+      title: 'Kigali CBD',
+      position: { lat: -1.9441, lng: 30.0619 },
+      image: 'src/assets/1.jpg',
+    },
+    {
+      title: 'Kigali Heights',
+      position: { lat: -1.9536, lng: 30.0925 },
+      image: 'src/assets/2.jpg',
+    },
+    {
+      title: 'Kimironko',
+      position: { lat: -1.9366, lng: 30.1306 },
+      image: 'src/assets/3.jpg',
+    },
+  ];
+
+  const map = new window.google.maps.Map(el, {
+    center: locations[0]?.position ?? { lat: -1.9441, lng: 30.0619 },
+    zoom: 12,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: true,
+  });
+
+  const infoWindow = new window.google.maps.InfoWindow();
+
+  locations.forEach((loc) => {
+    const marker = new window.google.maps.Marker({
+      map,
+      position: loc.position,
+      title: loc.title,
+    });
+
+    marker.addListener('click', () => {
+      const title = escapeHtml(loc.title);
+      const imgSrc = escapeHtml(loc.image);
+      infoWindow.setContent(`
+        <div style="max-width:260px">
+          <div style="font-weight:800;margin:0 0 10px 0;color:#111827;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;">
+            ${title}
+          </div>
+          <img src="${imgSrc}" alt="${title}" style="width:100%;height:160px;object-fit:cover;border-radius:12px;border:1px solid rgba(17,24,39,0.12);" loading="lazy" />
+        </div>
+      `);
+      infoWindow.open({ map, anchor: marker });
+    });
+  });
+};
