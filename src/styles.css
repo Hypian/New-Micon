@@ -2463,20 +2463,19 @@ section { padding: 96px 24px; }
   line-height: 1;
 }
 
-/* iOS-style liquid glass for hero pills (badge + CTAs) */
 #hero.hero-section .hero-badge-micon,
 #hero.hero-section .hero-btns .btn-primary,
 #hero.hero-section .hero-btns .btn-secondary {
   position: relative;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.10) !important;
-  backdrop-filter: blur(40px) saturate(200%) brightness(1.12);
-  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.12);
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  background: rgba(0, 0, 0, 0.28) !important;
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
   box-shadow:
-    0 10px 26px rgba(15, 23, 42, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.14);
+    0 10px 26px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
 }
 
 #hero.hero-section .hero-badge-micon::before,
@@ -2541,7 +2540,7 @@ section { padding: 96px 24px; }
 #hero.hero-section .hero-btns .btn-secondary,
 #hero.hero-section .hero-btns .btn-primary *,
 #hero.hero-section .hero-btns .btn-secondary * {
-  color: rgba(17, 24, 39, 0.92) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
 }
 
 #hero.hero-section .hero-badge-micon:hover,
@@ -2550,13 +2549,13 @@ section { padding: 96px 24px; }
 #hero.hero-section .hero-badge-micon:focus-visible,
 #hero.hero-section .hero-btns .btn-primary:focus-visible,
 #hero.hero-section .hero-btns .btn-secondary:focus-visible {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border-color: rgba(255, 255, 255, 0.36) !important;
+  background: rgba(0, 0, 0, 0.38) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
   transform: translateY(-1px);
   box-shadow:
-    0 14px 34px rgba(15, 23, 42, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.16);
+    0 14px 34px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
 }
 
 #hero.hero-section .hero-cta-primary {
