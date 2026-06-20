@@ -344,13 +344,42 @@ function heroPlaySequence() {
     setHeroOpacity(0);
     heroVideo.loop = true;
     heroVideo.play().catch(() => {});
-    heroFadeTo(1, 250);
+    heroFadeTo(1, 600);
 }
 
 if (heroVideo) {
-    heroVideo.addEventListener('loadeddata', () => {
-        heroPlaySequence();
-    });
+    // Keep video hidden behind poster until ready
+    setHeroOpacity(0);
+
+    // Listen for when enough data is loaded to play
+    heroVideo.addEventListener('canplay', heroPlaySequence, { once: true });
+
+    // Defer loading until after the page is interactive — never blocks LCP
+    const startVideoLoad = () => {
+        if (heroVideo.readyState >= 3) {
+            // Already buffered (e.g. cached), play immediately
+            heroPlaySequence();
+        } else {
+            heroVideo.load();
+        }
+    };
+
+    if (document.readyState === 'complete') {
+        // Page already loaded (e.g. cached navigation)
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(startVideoLoad, { timeout: 2000 });
+        } else {
+            setTimeout(startVideoLoad, 200);
+        }
+    } else {
+        window.addEventListener('load', () => {
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(startVideoLoad, { timeout: 2000 });
+            } else {
+                setTimeout(startVideoLoad, 200);
+            }
+        }, { once: true });
+    }
 }
 
 // ─── ACTIVE NAV LINK ON SCROLL ───────────────────────────────────────────────
