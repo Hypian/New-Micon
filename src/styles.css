@@ -289,7 +289,7 @@ h1, h2, h3, h4, h5 {
 #hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.24);
+  background: rgba(0,0,0,0.55);
   z-index: 1;
   pointer-events: none;
 }
@@ -425,9 +425,10 @@ h1, h2, h3, h4, h5 {
   font-size: 80px;
   line-height: 1;
   letter-spacing: -4.8px;
-  color: #000;
+  color: #ffffff;
   margin: 0;
   text-align: center;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.3);
 }
 
 .hero-sub {
@@ -435,11 +436,12 @@ h1, h2, h3, h4, h5 {
   font-weight: 500;
   font-size: 20px;
   letter-spacing: -0.4px;
-  color: #505050;
+  color: rgba(255,255,255,0.85);
   max-width: 736px;
   width: min(736px, 100%);
   margin: 0 auto;
   text-align: center;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.4);
 }
 
 
@@ -536,10 +538,10 @@ h1, h2, h3, h4, h5 {
   position: absolute; 
   inset: 0;
   background: linear-gradient(
-    135deg,
-    rgba(88, 28, 135, 0.45) 0%,
-    rgba(15, 23, 42, 0.4) 45%,
-    rgba(190, 18, 60, 0.45) 100%
+    to bottom,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.45) 50%,
+    rgba(0, 0, 0, 0.65) 100%
   );
   z-index: 1;
   pointer-events: none;
