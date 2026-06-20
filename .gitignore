@@ -1,0 +1,9 @@
+node_modules/
+excel/
+*.pyc
+__pycache__/
+*.zip
+head_*.txt
+*.xlsx
+.env
+.DS_Store

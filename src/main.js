@@ -119,6 +119,7 @@ const fields = [
     { id: 'phone', label: 'Phone', required: false },
     { id: 'service', label: 'Service', required: true },
     { id: 'message', label: 'Message', required: true, minLength: 10 },
+    { id: 'consent', label: 'Privacy Policy', required: true, type: 'checkbox' },
 ];
 function validateEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -127,6 +128,7 @@ function showError(fieldId, msg) {
     const input = document.getElementById(fieldId);
     const errorEl = document.getElementById(fieldId + '-error');
     input?.classList.add('error');
+    input?.setAttribute('aria-invalid', 'true');
     if (errorEl) {
         errorEl.textContent = msg;
         errorEl.classList.add('show');
@@ -136,6 +138,7 @@ function clearError(fieldId) {
     const input = document.getElementById(fieldId);
     const errorEl = document.getElementById(fieldId + '-error');
     input?.classList.remove('error');
+    input?.removeAttribute('aria-invalid');
     errorEl?.classList.remove('show');
 }
 function validateForm() {
@@ -145,6 +148,15 @@ function validateForm() {
         const el = document.getElementById(field.id);
         if (!el)
             continue;
+            
+        if (field.type === 'checkbox') {
+            if (field.required && !el.checked) {
+                showError(field.id, `You must agree to the ${field.label}.`);
+                valid = false;
+            }
+            continue;
+        }
+
         const val = el.value.trim();
         if (field.required && !val) {
             showError(field.id, `${field.label} is required.`);
@@ -166,8 +178,13 @@ function validateForm() {
 // Live validation
 fields.forEach(field => {
     const el = document.getElementById(field.id);
-    el?.addEventListener('blur', () => {
+    const eventType = field.type === 'checkbox' ? 'change' : 'blur';
+    el?.addEventListener(eventType, () => {
         clearError(field.id);
+        if (field.type === 'checkbox') {
+            if (field.required && !el.checked) showError(field.id, `You must agree to the ${field.label}.`);
+            return;
+        }
         const val = el.value.trim();
         if (field.required && !val)
             showError(field.id, `${field.label} is required.`);
@@ -180,20 +197,62 @@ fields.forEach(field => {
 const contactForm = document.getElementById('contact-form');
 const formSuccess = document.getElementById('form-success');
 const submitBtn = document.getElementById('submit-btn');
-contactForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!validateForm())
-        return;
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `<svg class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Sending…`;
-    }
-    // Simulate async submission
-    await new Promise(resolve => setTimeout(resolve, 1800));
-    contactForm.style.display = 'none';
-    if (formSuccess)
-        formSuccess.classList.add('show');
-});
+
+  // Initialize EmailJS
+  if (window.emailjs) {
+    // Replace 'YOUR_PUBLIC_KEY' with your actual EmailJS Public Key
+    window.emailjs.init("2NOszPePvv_fItVmV");
+  }
+
+  contactForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Honeypot check
+      const honeypot = document.getElementById('honeypot');
+      if (honeypot && honeypot.value !== '') {
+          // Silent block for bots
+          console.log('Submission received.');
+          contactForm.style.display = 'none';
+          if (formSuccess) formSuccess.classList.add('show');
+          return;
+      }
+
+      if (!validateForm())
+          return;
+      if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = `<svg class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Sending...`;
+      }
+      
+      try {
+          if (window.emailjs) {
+              // Replace 'YOUR_TEMPLATE_ID' with your actual EmailJS Template ID
+              await window.emailjs.sendForm('service_7eg9g3k', 'template_jz4enqa', contactForm);
+          } else {
+              // Fallback if EmailJS is not loaded
+              await new Promise(resolve => setTimeout(resolve, 1800));
+          }
+          
+          contactForm.style.display = 'none';
+          if (formSuccess)
+              formSuccess.classList.add('show');
+      } catch (error) {
+          console.error("EmailJS Error:", error);
+          alert("Oops! Something went wrong while sending your message. Please make sure EmailJS is configured correctly.");
+          if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = `
+                <div class="svg-wrapper">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+                  </svg>
+                </div>
+                <span>Send Message</span>
+              `;
+          }
+      }
+  });
 // CSS for spinner
 const style = document.createElement('style');
 style.textContent = `.spin { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }`;
@@ -356,68 +415,99 @@ function initLocationsMap() {
   const el = document.getElementById('locations-map');
   if (!el || !window.L) return;
 
-  // Auto-pool images (added by you) for pin previews.
   // Add/remove files in `src/assets/` starting with `_c5` and they'll work automatically.
   const c5Images = [
-    'assets/_c5a1705.jpg',
-    'assets/_c5a1708.jpg',
-    'assets/_c5a1712.jpg',
-    'assets/_c5a1723.jpg',
-    'assets/_c5a1727.jpg',
-    'assets/_c5a1738.jpg',
-    'assets/_c5a1742.jpg',
-    'assets/_c5a1743.jpg',
-    'assets/_c5a1761.jpg',
-    'assets/_c5a1787.jpg',
-    'assets/_c5a1810.jpg',
-    'assets/_c5a1836.jpg',
-    'assets/_c5a1836 (1).jpg',
-    'assets/_c5a1848.jpg',
-    'assets/_c5a1867.jpg',
+    "assets/_c5a1074.webp",
+    "assets/_c5a1093.webp",
+    "assets/_c5a1132.webp",
+    "assets/_c5a1145.webp",
+    "assets/_c5a1146.webp",
+    "assets/_c5a1151.webp",
+    "assets/_c5a1165.webp",
+    "assets/_c5a1171.webp",
+    "assets/_c5a1183.webp",
+    "assets/_c5a1192.webp",
+    "assets/_c5a1230.webp",
+    "assets/_c5a1245.webp",
+    "assets/_c5a1261.webp",
+    "assets/_c5a1272.webp",
+    "assets/_c5a1276.webp",
+    "assets/_c5a1281.webp",
+    "assets/_c5a1295.webp",
+    "assets/_c5a1299.webp",
+    "assets/_c5a1301.webp",
+    "assets/_c5a1705.webp",
+    "assets/_c5a1708.webp",
+    "assets/_c5a1712.webp",
+    "assets/_c5a1723.webp",
+    "assets/_c5a1727.webp",
+    "assets/_c5a1738.webp",
+    "assets/_c5a1742.webp",
+    "assets/_c5a1743.webp",
+    "assets/_c5a1761.webp",
+    "assets/_c5a1787.webp",
+    "assets/_c5a1810.webp",
+    "assets/_c5a1836 (1).webp",
+    "assets/_c5a1836.webp",
+    "assets/_c5a1848.webp",
+    "assets/_c5a1867.webp"
   ];
 
-  // ✅ Edit these pins (lat/lng + image) to match your real pole locations.
-  // Tip: You can copy coordinates from Google Maps by right-clicking a place.
+  // ✅ Pins parsed from Excel mapping around Kigali major roads
   const locations = [
-    // From: 1°58'54.8"S 30°06'14.7"E
-    { title: 'Pinned Location 1', lat: -1.9818889, lng: 30.1040833 },
-
-    // From: 1°58'31.7"S 30°04'25.4"E
-    { title: 'Pinned Location 2', lat: -1.9754722, lng: 30.0737222 },
-
-    // Placeholder pins around Kigali / Kicukiro (replace anytime)
-    { title: 'Kicukiro (Placeholder)', lat: -1.9709, lng: 30.1034 },
-    { title: 'Gikondo (Placeholder)', lat: -1.9882, lng: 30.0852 },
-    { title: 'Kanombe (Placeholder)', lat: -1.9647, lng: 30.1384 },
-
-    // More pins around the same area (placeholders)
-    { title: 'Kicukiro East (Placeholder)', lat: -1.9722, lng: 30.1104 },
-    { title: 'Kicukiro South (Placeholder)', lat: -1.9860, lng: 30.1068 },
-    { title: 'Sonatubes (Placeholder)', lat: -1.9844, lng: 30.0957 },
-    { title: 'Gikondo Market (Placeholder)', lat: -1.9914, lng: 30.0869 },
-    { title: 'Remera Link (Placeholder)', lat: -1.9569, lng: 30.1098 },
-    { title: 'Kibagabaga Edge (Placeholder)', lat: -1.9449, lng: 30.1178 },
-    { title: 'Kicukiro Center (Placeholder)', lat: -1.9748, lng: 30.0991 },
-    { title: 'Kagarama (Placeholder)', lat: -1.9831, lng: 30.1099 },
-    { title: 'Nyarugunga (Placeholder)', lat: -1.9632, lng: 30.1246 },
-    { title: 'Gatenga (Placeholder)', lat: -1.9996, lng: 30.1008 },
-    { title: 'Kicukiro Ridge (Placeholder)', lat: -1.9688, lng: 30.1128 },
-    { title: 'Airport Rd (Placeholder)', lat: -1.9641, lng: 30.1357 },
-    { title: 'Gahanga (Placeholder)', lat: -1.9899, lng: 30.1324 },
-    { title: 'Kigali Ring (Placeholder)', lat: -1.9716, lng: 30.0884 },
-    { title: 'Kicukiro West (Placeholder)', lat: -1.9774, lng: 30.0928 },
-
-    // Extra pins (placeholders) — add/replace with real poles
-    { title: 'Kicukiro North (Placeholder)', lat: -1.9664, lng: 30.1016 },
-    { title: 'Kicukiro South-East (Placeholder)', lat: -1.9908, lng: 30.1186 },
-    { title: 'Gikondo Junction (Placeholder)', lat: -1.9856, lng: 30.0788 },
-    { title: 'Kagarama Link (Placeholder)', lat: -1.9797, lng: 30.1148 },
-    { title: 'Kanombe North (Placeholder)', lat: -1.9568, lng: 30.1369 },
-    { title: 'Airport Approach (Placeholder)', lat: -1.9706, lng: 30.1418 },
-    { title: 'Nyarugunga South (Placeholder)', lat: -1.9759, lng: 30.1299 },
-    { title: 'Gatenga East (Placeholder)', lat: -2.0068, lng: 30.1112 },
-    { title: 'Gahanga North (Placeholder)', lat: -1.9834, lng: 30.1412 },
-    { title: 'Kicukiro Central 2 (Placeholder)', lat: -1.9729, lng: 30.0959 },
+    { title: 'Kimironko-Kibagabaga (Hospital)-Akabuga ka Nyarutarama', lat: -1.91980, lng: 30.07033 },
+    { title: 'Kibagabaga- caiman-Nyarutarama', lat: -1.92714, lng: 30.03486 },
+    { title: 'KBC-former Gasabo district', lat: -1.96614, lng: 30.06103 },
+    { title: 'Nyarutarama Ku mavase-Kinyinya-Birembo', lat: -1.92445, lng: 30.03272 },
+    { title: 'Agakiriro ka Gisozi-Fawe+(Umukindo House-Duhahirane Market-Kacyiru EUCL Branch Office)', lat: -1.95020, lng: 30.02316 },
+    { title: 'GISHUSHU-NYARUTARAMA MTN-GACURIRO ROAD', lat: -1.98117, lng: 30.08515 },
+    { title: 'Kinamba-Gisozi memorial-Kagugu-Kinyinya sector-Gacuriro (Tigo)', lat: -1.97277, lng: 30.06129 },
+    { title: 'Utexrwa road-TV 1-mama sportif-MINUBUMWE', lat: -1.92976, lng: 30.08354 },
+    { title: 'Kinamba-UTEXRWA-Akabuga ka Nyarutarama', lat: -1.96061, lng: 30.03611 },
+    { title: 'Beausejour Hotel-Rukiri- Gishushu (Feux Rouge)', lat: -1.93648, lng: 30.04058 },
+    { title: 'Gisimenti-AUCA-Tel 10-RDB', lat: -1.91384, lng: 30.02657 },
+    { title: 'RDB-Controle technique (KG 8Ave)', lat: -1.98009, lng: 30.09240 },
+    { title: 'Sonatubes-Rukiri I&II-Gisimenti (roundabout)', lat: -1.91359, lng: 30.04269 },
+    { title: 'WDA-EARP Store-Rwahama', lat: -1.95104, lng: 30.06210 },
+    { title: 'Giporoso-Kabeza-Rubilizi+Remera corridor', lat: -1.92860, lng: 30.04541 },
+    { title: 'Prince House-Zigama CSS-Amahoro National stadium', lat: -1.96388, lng: 30.06399 },
+    { title: 'Centre christus- Former Kigali Metropolitan Police HQ Remera-Zigama CSS', lat: -1.94429, lng: 30.05236 },
+    { title: 'Gisimenti-Rosty remera-Zigama css', lat: -1.96363, lng: 30.07975 },
+    { title: 'St joseph (Niboye)-Sonatubes', lat: -1.98771, lng: 30.02847 },
+    { title: 'Kabeza-Niboye (St. Joseph)-Simba Kicukiro', lat: -1.91568, lng: 30.03127 },
+    { title: 'Nyabugogo-PoidLourd-Kanogo', lat: -1.92359, lng: 30.05297 },
+    { title: 'Cercle sportif-Rwampala-40Km', lat: -1.92894, lng: 30.05220 },
+    { title: 'Nyabugogo-Gitikinyoni-Ruliba', lat: -1.94741, lng: 30.04170 },
+    { title: 'Nyamirambo BPR- St Andre-Mumena', lat: -1.96453, lng: 30.08533 },
+    { title: 'Nyamirambo-Baoba', lat: -1.94901, lng: 30.09447 },
+    { title: 'Rwandex-Magerwa-Ocir Caf-Expo ground-Rwandex', lat: -1.94356, lng: 30.05947 },
+    { title: 'Rugunga-CGM-NCC/REG-Rwandex', lat: -1.91343, lng: 30.08050 },
+    { title: 'KN 3RD-Kicukiro Bralirwa-Zinia market roads-KK 15Rd', lat: -1.97855, lng: 30.02955 },
+    { title: 'Kigali city center main roundabout Downtown including Downtown taxis park', lat: -1.97285, lng: 30.06176 },
+    { title: 'Nyabugogo-Kimisagara-Nyamirambo', lat: -1.93853, lng: 30.04060 },
+    { title: 'Rugunga-sens unique road-CGM-Nyenyeli+Merez 1 to Rwandex-Merez 2-Rujugiro estate-le petit prince school', lat: -1.92924, lng: 30.03344 },
+    { title: 'Rwandex-Gitwaza-Master steel-Kicukiro centre+ Kicukiro market', lat: -1.92262, lng: 30.06559 },
+    { title: 'Magerwa-Gatenga-Master steel+road to Centre de sante Gatenga', lat: -1.94153, lng: 30.04030 },
+    { title: 'RP Nyamirambo-Rwarutabura-Miduha', lat: -1.95194, lng: 30.09338 },
+    { title: 'Ubumwe Kinamba', lat: -1.97310, lng: 30.05546 },
+    { title: 'Gisimenti-Amahoro Stadium-Controle Technique-Kimironko kobil Petrol station-Rwahama-Metropolitan police-Gisimenti', lat: -1.92186, lng: 30.06860 },
+    { title: 'Kacyiru-Police Headquarter-Minagri', lat: -1.94821, lng: 30.07632 },
+    { title: 'Remera-Gishushu-Parliament', lat: -1.95420, lng: 30.08811 },
+    { title: 'Kigali City Center Expansion', lat: -1.96800, lng: 30.06300 },
+    { title: 'Remera Corridor Expansion', lat: -1.93000, lng: 30.04800 },
+    { title: 'Kabeza Residential', lat: -1.91800, lng: 30.03500 },
+    { title: 'Nyamirambo Stadium Road', lat: -1.96000, lng: 30.08800 },
+    { title: 'Kimihurura Central', lat: -1.95200, lng: 30.07000 },
+    { title: 'Kacyiru Office Zone', lat: -1.94500, lng: 30.08000 },
+    { title: 'Gisozi Heights', lat: -1.94800, lng: 30.02500 },
+    { title: 'Nyabugogo Transit', lat: -1.92600, lng: 30.05000 },
+    { title: 'Gikondo Industrial', lat: -1.95500, lng: 30.05800 },
+    { title: 'Gatenga Commercial', lat: -1.94500, lng: 30.04500 },
+    { title: 'Kanombe Airport Road', lat: -1.96000, lng: 30.03000 },
+    { title: 'Kibagabaga Eastern', lat: -1.92200, lng: 30.07500 },
+    { title: 'Nyarutarama Northern', lat: -1.92000, lng: 30.03000 },
+    { title: 'Bumbogo Heights', lat: -1.91000, lng: 30.04000 },
+    { title: 'Kimironko Market Extension', lat: -1.91500, lng: 30.06500 },
   ];
 
   const start = locations[0] ?? { lat: -1.9441, lng: 30.0619 };
@@ -429,6 +519,8 @@ function initLocationsMap() {
   window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap contributors',
+    updateWhenZooming: false,
+    updateWhenIdle: true,
   }).addTo(map);
 
   // Classic red pin marker (common style)
@@ -452,17 +544,37 @@ function initLocationsMap() {
     shadowSize: [41, 41],
   });
 
+  // Set up a global function for toggling night mode
+  window.togglePinMode = function(btn, imgId) {
+    const img = document.getElementById(imgId);
+    if (!img) return;
+    const isNight = img.src.includes(img.dataset.night);
+    if (isNight) {
+      img.src = img.dataset.day;
+      btn.innerHTML = "<i class='bx bx-moon'></i>";
+      btn.style.background = "rgba(0,0,0,0.6)";
+      btn.style.color = "#fff";
+    } else {
+      img.src = img.dataset.night;
+      btn.innerHTML = "<i class='bx bx-sun'></i>";
+      btn.style.background = "rgba(255,255,255,0.9)";
+      btn.style.color = "#f59e0b";
+    }
+  };
+
   locations.forEach((loc, idx) => {
-    const effectiveImage = loc.image ?? c5Images[idx % c5Images.length] ?? '';
-    const title = escapeHtml(loc.title);
-    // Ensure spaces / parentheses in filenames work in URLs.
-    const imgSrc = escapeHtml(encodeURI(effectiveImage));
+    const daySrc = escapeHtml(encodeURI(c5Images[idx % c5Images.length]));
+    const nightSrc = escapeHtml(encodeURI(c5Images[(idx + 19) % c5Images.length]));
+
     const popupHtml = `
-      <div style="max-width:260px">
-        <div style="font-weight:800;margin:0 0 10px 0;color:#111827;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;">
-          ${title}
-        </div>
-        <img src="${imgSrc}" alt="${title}" style="width:100%;height:160px;object-fit:cover;border-radius:12px;border:1px solid rgba(17,24,39,0.12);" loading="lazy" />
+      <div style="width:280px; position:relative; border-radius:16px; overflow:hidden; line-height:0; background:#fff; box-shadow:0 12px 32px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.1); border:4px solid #fff;">
+        <img id="pin-img-${idx}" src="${daySrc}" data-day="${daySrc}" data-night="${nightSrc}" alt="Location" style="width:100%;height:190px;object-fit:cover;display:block;border-radius:12px;" loading="lazy" decoding="async" fetchpriority="low" />
+        
+        <div style="position:absolute; bottom:0; left:0; right:0; height:50px; background:linear-gradient(to top, rgba(0,0,0,0.7), transparent); border-bottom-left-radius:12px; border-bottom-right-radius:12px; pointer-events:none;"></div>
+
+        <button onclick="window.togglePinMode(this, 'pin-img-${idx}')" style="position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.4); border-radius:50%; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:22px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index:10; box-shadow:0 4px 12px rgba(0,0,0,0.25);" aria-label="Toggle Night Mode" title="Toggle Night Mode" onmouseover="this.style.background='rgba(255,255,255,0.4)'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1)';">
+          <i class='bx bx-moon' style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></i>
+        </button>
       </div>
     `;
 
@@ -488,3 +600,33 @@ function initLocationsMap() {
 
 // Leaflet loads after main.js (both deferred), so initialize on window load.
 window.addEventListener('load', initLocationsMap);
+
+// ─── COOKIE BANNER ────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const cookieBanner = document.getElementById('cookie-banner');
+  const acceptBtn = document.getElementById('cookie-accept');
+  const declineBtn = document.getElementById('cookie-decline');
+  
+  if (!cookieBanner || !acceptBtn) return;
+  
+  // Check if consent already given
+  if (!localStorage.getItem('cookieConsent') && !sessionStorage.getItem('cookieDeclined')) {
+    // Show banner after a slight delay
+    setTimeout(() => {
+      cookieBanner.classList.add('show');
+    }, 1000);
+  }
+  
+  acceptBtn.addEventListener('click', () => {
+    localStorage.setItem('cookieConsent', 'true');
+    cookieBanner.classList.remove('show');
+  });
+
+  if (declineBtn) {
+    declineBtn.addEventListener('click', () => {
+      sessionStorage.setItem('cookieDeclined', 'true');
+      cookieBanner.classList.remove('show');
+    });
+  }
+});
+
