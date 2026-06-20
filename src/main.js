@@ -237,8 +237,11 @@ const submitBtn = document.getElementById('submit-btn');
           if (formSuccess)
               formSuccess.classList.add('show');
       } catch (error) {
-          console.error("EmailJS Error:", error);
-          alert("Oops! Something went wrong while sending your message. Please make sure EmailJS is configured correctly.");
+          console.error("EmailJS Error (full):", error);
+          // EmailJS errors have .status and .text fields
+          const ejsStatus = error?.status ? `[${error.status}]` : '';
+          const ejsText = error?.text || error?.message || JSON.stringify(error);
+          alert(`Oops! Something went wrong while sending your message.\n\n${ejsStatus} ${ejsText}\n\nCheck the browser console for details.`);
           if (submitBtn) {
               submitBtn.disabled = false;
               submitBtn.innerHTML = `
