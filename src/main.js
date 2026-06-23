@@ -485,61 +485,51 @@ function initLocationsMap() {
     "assets/_c5a1867.webp"
   ];
 
-  // ✅ Pins parsed from Excel mapping around Kigali major roads
+  // ✅ Pins from Excel "Ad Spots" sheet — 40 real Micon Real Line locations across Kigali
   const locations = [
-    { title: 'Kimironko-Kibagabaga (Hospital)-Akabuga ka Nyarutarama', lat: -1.91980, lng: 30.07033 },
-    { title: 'Kibagabaga- caiman-Nyarutarama', lat: -1.92714, lng: 30.03486 },
-    { title: 'KBC-former Gasabo district', lat: -1.96614, lng: 30.06103 },
-    { title: 'Nyarutarama Ku mavase-Kinyinya-Birembo', lat: -1.92445, lng: 30.03272 },
-    { title: 'Agakiriro ka Gisozi-Fawe+(Umukindo House-Duhahirane Market-Kacyiru EUCL Branch Office)', lat: -1.95020, lng: 30.02316 },
-    { title: 'GISHUSHU-NYARUTARAMA MTN-GACURIRO ROAD', lat: -1.98117, lng: 30.08515 },
-    { title: 'Kinamba-Gisozi memorial-Kagugu-Kinyinya sector-Gacuriro (Tigo)', lat: -1.97277, lng: 30.06129 },
-    { title: 'Utexrwa road-TV 1-mama sportif-MINUBUMWE', lat: -1.92976, lng: 30.08354 },
-    { title: 'Kinamba-UTEXRWA-Akabuga ka Nyarutarama', lat: -1.96061, lng: 30.03611 },
-    { title: 'Beausejour Hotel-Rukiri- Gishushu (Feux Rouge)', lat: -1.93648, lng: 30.04058 },
-    { title: 'Gisimenti-AUCA-Tel 10-RDB', lat: -1.91384, lng: 30.02657 },
-    { title: 'RDB-Controle technique (KG 8Ave)', lat: -1.98009, lng: 30.09240 },
-    { title: 'Sonatubes-Rukiri I&II-Gisimenti (roundabout)', lat: -1.91359, lng: 30.04269 },
-    { title: 'WDA-EARP Store-Rwahama', lat: -1.95104, lng: 30.06210 },
-    { title: 'Giporoso-Kabeza-Rubilizi+Remera corridor', lat: -1.92860, lng: 30.04541 },
-    { title: 'Prince House-Zigama CSS-Amahoro National stadium', lat: -1.96388, lng: 30.06399 },
-    { title: 'Centre christus- Former Kigali Metropolitan Police HQ Remera-Zigama CSS', lat: -1.94429, lng: 30.05236 },
-    { title: 'Gisimenti-Rosty remera-Zigama css', lat: -1.96363, lng: 30.07975 },
-    { title: 'St joseph (Niboye)-Sonatubes', lat: -1.98771, lng: 30.02847 },
-    { title: 'Kabeza-Niboye (St. Joseph)-Simba Kicukiro', lat: -1.91568, lng: 30.03127 },
-    { title: 'Nyabugogo-PoidLourd-Kanogo', lat: -1.92359, lng: 30.05297 },
-    { title: 'Cercle sportif-Rwampala-40Km', lat: -1.92894, lng: 30.05220 },
-    { title: 'Nyabugogo-Gitikinyoni-Ruliba', lat: -1.94741, lng: 30.04170 },
-    { title: 'Nyamirambo BPR- St Andre-Mumena', lat: -1.96453, lng: 30.08533 },
-    { title: 'Nyamirambo-Baoba', lat: -1.94901, lng: 30.09447 },
-    { title: 'Rwandex-Magerwa-Ocir Caf-Expo ground-Rwandex', lat: -1.94356, lng: 30.05947 },
-    { title: 'Rugunga-CGM-NCC/REG-Rwandex', lat: -1.91343, lng: 30.08050 },
-    { title: 'KN 3RD-Kicukiro Bralirwa-Zinia market roads-KK 15Rd', lat: -1.97855, lng: 30.02955 },
-    { title: 'Kigali city center main roundabout Downtown including Downtown taxis park', lat: -1.97285, lng: 30.06176 },
-    { title: 'Nyabugogo-Kimisagara-Nyamirambo', lat: -1.93853, lng: 30.04060 },
-    { title: 'Rugunga-sens unique road-CGM-Nyenyeli+Merez 1 to Rwandex-Merez 2-Rujugiro estate-le petit prince school', lat: -1.92924, lng: 30.03344 },
-    { title: 'Rwandex-Gitwaza-Master steel-Kicukiro centre+ Kicukiro market', lat: -1.92262, lng: 30.06559 },
-    { title: 'Magerwa-Gatenga-Master steel+road to Centre de sante Gatenga', lat: -1.94153, lng: 30.04030 },
-    { title: 'RP Nyamirambo-Rwarutabura-Miduha', lat: -1.95194, lng: 30.09338 },
-    { title: 'Ubumwe Kinamba', lat: -1.97310, lng: 30.05546 },
-    { title: 'Gisimenti-Amahoro Stadium-Controle Technique-Kimironko kobil Petrol station-Rwahama-Metropolitan police-Gisimenti', lat: -1.92186, lng: 30.06860 },
-    { title: 'Kacyiru-Police Headquarter-Minagri', lat: -1.94821, lng: 30.07632 },
-    { title: 'Remera-Gishushu-Parliament', lat: -1.95420, lng: 30.08811 },
-    { title: 'Kigali City Center Expansion', lat: -1.96800, lng: 30.06300 },
-    { title: 'Remera Corridor Expansion', lat: -1.93000, lng: 30.04800 },
-    { title: 'Kabeza Residential', lat: -1.91800, lng: 30.03500 },
-    { title: 'Nyamirambo Stadium Road', lat: -1.96000, lng: 30.08800 },
-    { title: 'Kimihurura Central', lat: -1.95200, lng: 30.07000 },
-    { title: 'Kacyiru Office Zone', lat: -1.94500, lng: 30.08000 },
-    { title: 'Gisozi Heights', lat: -1.94800, lng: 30.02500 },
-    { title: 'Nyabugogo Transit', lat: -1.92600, lng: 30.05000 },
-    { title: 'Gikondo Industrial', lat: -1.95500, lng: 30.05800 },
-    { title: 'Gatenga Commercial', lat: -1.94500, lng: 30.04500 },
-    { title: 'Kanombe Airport Road', lat: -1.96000, lng: 30.03000 },
-    { title: 'Kibagabaga Eastern', lat: -1.92200, lng: 30.07500 },
-    { title: 'Nyarutarama Northern', lat: -1.92000, lng: 30.03000 },
-    { title: 'Bumbogo Heights', lat: -1.91000, lng: 30.04000 },
-    { title: 'Kimironko Market Extension', lat: -1.91500, lng: 30.06500 },
+    // ── GASABO DISTRICT ──────────────────────────────────────────────────────
+    { title: 'Kimironko-Kibagabaga (Hospital)-Akabuga ka Nyarutarama', poles: 134, lat: -1.9198, lng: 30.1003 },
+    { title: 'Kibagabaga-Caiman-Nyarutarama', poles: 75,  lat: -1.9149, lng: 30.0958 },
+    { title: 'KBC-Former Gasabo District', poles: 70,  lat: -1.9310, lng: 30.0934 },
+    { title: 'Nyarutarama Ku Mavase-Kinyinya-Birembo', poles: 149, lat: -1.9082, lng: 30.1015 },
+    { title: 'Agakiriro ka Gisozi-Fawe + Umukindo House-Duhahirane Market-Kacyiru EUCL Branch Office', poles: 42,  lat: -1.9397, lng: 30.0742 },
+    { title: 'Gishushu-Nyarutarama MTN-Gacuriro Road', poles: 114, lat: -1.9261, lng: 30.0887 },
+    { title: 'Kinamba-Gisozi Memorial-Kagugu-Kinyinya Sector-Gacuriro (Tigo)', poles: 281, lat: -1.9350, lng: 30.0820 },
+    { title: 'Utexrwa Road-TV 1-Mama Sportif-MINUBUMWE', poles: 28,  lat: -1.9505, lng: 30.0648 },
+    { title: 'Kinamba-UTEXRWA-Akabuga ka Nyarutarama', poles: 114, lat: -1.9438, lng: 30.0768 },
+    { title: 'Beausejour Hotel-Rukiri-Gishushu (Feux Rouge)', poles: 28,  lat: -1.9320, lng: 30.0862 },
+    { title: 'WDA-EARP Store-Rwahama', poles: 13,  lat: -1.9290, lng: 30.1053 },
+    { title: 'New Sites in Gasabo', poles: 200, lat: -1.9184, lng: 30.0851 },
+    // ── NYARUGENGE DISTRICT ───────────────────────────────────────────────────
+    { title: 'Gisimenti-AUCA-Tel 10-RDB', poles: 33,  lat: -1.9540, lng: 30.0613 },
+    { title: 'RDB-Controle Technique (KG 8Ave)', poles: 75,  lat: -1.9560, lng: 30.0590 },
+    { title: 'Sonatubes-Rukiri I&II-Gisimenti (Roundabout)', poles: 33,  lat: -1.9475, lng: 30.0637 },
+    { title: 'Giporoso-Kabeza-Rubilizi + Remera Corridor', poles: 125, lat: -1.9410, lng: 30.0710 },
+    { title: 'Prince House-Zigama CSS-Amahoro National Stadium', poles: 13,  lat: -1.9486, lng: 30.0751 },
+    { title: 'Centre Christus-Former Kigali Metropolitan Police HQ Remera-Zigama CSS', poles: 16,  lat: -1.9460, lng: 30.0790 },
+    { title: 'Gisimenti-Rosty Remera-Zigama CSS', poles: 30,  lat: -1.9450, lng: 30.0820 },
+    { title: 'Nyabugogo-PoidLourd-Kanogo', poles: 161, lat: -1.9607, lng: 30.0521 },
+    { title: 'Cercle Sportif-Rwampala-40Km', poles: 47,  lat: -1.9635, lng: 30.0552 },
+    { title: 'Nyabugogo-Gitikinyoni-Ruliba', poles: 189, lat: -1.9580, lng: 30.0488 },
+    { title: 'Nyamirambo BPR-St Andre-Mumena', poles: 36,  lat: -1.9730, lng: 30.0490 },
+    { title: 'Nyamirambo-Baoba', poles: 33,  lat: -1.9762, lng: 30.0462 },
+    { title: 'Rwandex-Magerwa-Ocir Café-Expo Ground-Rwandex', poles: 49,  lat: -1.9672, lng: 30.0580 },
+    { title: 'Rugunga-CGM-NCC/REG-Rwandex', poles: 63,  lat: -1.9641, lng: 30.0608 },
+    { title: 'Kigali City Center Main Roundabout Downtown including Downtown Taxis Park', poles: 166, lat: -1.9518, lng: 30.0588 },
+    { title: 'Nyabugogo-Kimisagara-Nyamirambo', poles: 152, lat: -1.9649, lng: 30.0534 },
+    { title: 'Rugunga-Sens Unique Road-CGM-Nyenyeli + Merez 1 to Rwandex-Merez 2-Rujugiro Estate-Le Petit Prince School', poles: 89,  lat: -1.9595, lng: 30.0560 },
+    { title: 'RP Nyamirambo-Rwarutabura-Miduha', poles: 100, lat: -1.9720, lng: 30.0508 },
+    { title: 'Ubumwe Kinamba', poles: 76,  lat: -1.9558, lng: 30.0625 },
+    { title: 'New Sites in Nyarugenge', poles: 170, lat: -1.9500, lng: 30.0570 },
+    // ── KICUKIRO DISTRICT ────────────────────────────────────────────────────
+    { title: 'St Joseph (Niboye)-Sonatubes', poles: 100, lat: -1.9808, lng: 30.0655 },
+    { title: 'Kabeza-Niboye (St. Joseph)-Simba Kicukiro', poles: 107, lat: -1.9870, lng: 30.0710 },
+    { title: 'KN 3rd-Kicukiro Bralirwa-Zinia Market Roads-KK 15Rd', poles: 49,  lat: -1.9928, lng: 30.0610 },
+    { title: 'Rwandex-Gitwaza-Master Steel-Kicukiro Centre + Kicukiro Market', poles: 63,  lat: -1.9960, lng: 30.0680 },
+    { title: 'Magerwa-Gatenga-Master Steel + Road to Centre de Santé Gatenga', poles: 69,  lat: -2.0005, lng: 30.0640 },
+    { title: 'Gisimenti-Airtel-Amahoro Stadium-Controle Technique-Kimironko Kobil Petrol Station-Rwahama-Metropolitan Police-Gisimenti', poles: 137, lat: -1.9752, lng: 30.0740 },
+    { title: 'New Sites in Kicukiro', poles: 175, lat: -1.9902, lng: 30.0750 },
+    { title: 'Kigali City Center Expansion (Kicukiro access)', poles: 175, lat: -1.9848, lng: 30.0782 },
   ];
 
   const start = locations[0] ?? { lat: -1.9441, lng: 30.0619 };
@@ -598,15 +588,18 @@ function initLocationsMap() {
     const daySrc = escapeHtml(encodeURI(c5Images[idx % c5Images.length]));
     const nightSrc = escapeHtml(encodeURI(c5Images[(idx + 19) % c5Images.length]));
 
+    const polesLabel = loc.poles ? `<div style="line-height:1.2;padding:10px 14px 12px;background:#fff;"><div style="font-size:13px;font-weight:700;color:#111;margin-bottom:2px;">${escapeHtml(loc.title)}</div><div style="font-size:11px;color:#6B21A8;font-weight:600;letter-spacing:0.04em;">🔆 ${loc.poles} Street Poles</div></div>` : '';
+
     const popupHtml = `
       <div style="width:280px; position:relative; border-radius:16px; overflow:hidden; line-height:0; background:#fff; box-shadow:0 12px 32px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.1); border:4px solid #fff;">
-        <img id="pin-img-${idx}" src="${daySrc}" data-day="${daySrc}" data-night="${nightSrc}" alt="Location" style="width:100%;height:190px;object-fit:cover;display:block;border-radius:12px;" loading="lazy" decoding="async" fetchpriority="low" />
+        <img id="pin-img-${idx}" src="${daySrc}" data-day="${daySrc}" data-night="${nightSrc}" alt="Location" style="width:100%;height:160px;object-fit:cover;display:block;border-radius:12px 12px 0 0;" loading="lazy" decoding="async" fetchpriority="low" />
         
-        <div style="position:absolute; bottom:0; left:0; right:0; height:50px; background:linear-gradient(to top, rgba(0,0,0,0.7), transparent); border-bottom-left-radius:12px; border-bottom-right-radius:12px; pointer-events:none;"></div>
+        <div style="position:absolute; top:120px; left:0; right:0; height:50px; background:linear-gradient(to top, rgba(0,0,0,0.6), transparent); pointer-events:none;"></div>
 
-        <button onclick="window.togglePinMode(this, 'pin-img-${idx}')" style="position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.4); border-radius:50%; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:22px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index:10; box-shadow:0 4px 12px rgba(0,0,0,0.25);" aria-label="Toggle Night Mode" title="Toggle Night Mode" onmouseover="this.style.background='rgba(255,255,255,0.4)'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1)';">
+        <button onclick="window.togglePinMode(this, 'pin-img-${idx}')" style="position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.4); border-radius:50%; width:34px; height:34px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index:10; box-shadow:0 4px 12px rgba(0,0,0,0.25);" aria-label="Toggle Night Mode" title="Toggle Night Mode" onmouseover="this.style.background='rgba(255,255,255,0.4)'; this.style.transform='scale(1.05)';" onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1)';">
           <i class='bx bx-moon' style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></i>
         </button>
+        ${polesLabel}
       </div>
     `;
 
