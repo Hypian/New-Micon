@@ -677,12 +677,13 @@ h1, h2, h3, h4, h5 {
 .hero-headline .line:nth-child(1) { animation-delay: 0.15s; }
 .hero-headline .line:nth-child(2) {
   animation-delay: 0.3s;
-  background: linear-gradient(90deg, #FBBF24, #FB923C, #ec4899, #8b5cf6, #FBBF24);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: slide-up 0.85s cubic-bezier(0.4,0,0.2,1) forwards, gradient-shift 5s linear infinite;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #ffffff;
+  color: #ffffff;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.45);
+  animation: slide-up 0.85s cubic-bezier(0.4,0,0.2,1) forwards;
 }
 
 @keyframes gradient-shift {
@@ -2410,10 +2411,12 @@ section { padding: 96px 24px; }
 }
 
 #hero.hero-section .hero-headline .line:nth-child(2) {
-  background: var(--hero-brand-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #ffffff;
+  color: #ffffff;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 6px rgba(0,0,0,0.4);
   animation: hero-fade-up 0.82s cubic-bezier(0.22,1,0.36,1) 0.12s forwards;
 }
 
