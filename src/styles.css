@@ -1456,23 +1456,63 @@ section { padding: 96px 24px; }
 
 .clients-logo-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--border);
-  border: 1.5px solid var(--border);
-  border-radius: 18px;
-  overflow: hidden;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(107, 33, 168, 0.08), transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, #f7f7fb 100%);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 24px;
+  padding: 16px;
   margin: 52px 0;
+  box-shadow: 0 24px 70px rgba(17, 24, 39, 0.08);
 }
 
 .client-logo-cell {
-  background: white;
-  padding: 34px 24px;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.25s;
+  position: relative;
+  min-height: 154px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.86)),
+    #fff;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 14px;
+  padding: 28px 20px 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 24px rgba(17, 24, 39, 0.04);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
   cursor: default;
+  overflow: hidden;
+  isolation: isolate;
 }
-.client-logo-cell:hover { background: var(--surface); }
+.client-logo-cell::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 10px;
+  border: 1px dashed rgba(107, 33, 168, 0.1);
+  pointer-events: none;
+}
+.client-logo-cell::after {
+  content: attr(data-client);
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 13px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
+}
+.client-logo-cell:hover {
+  border-color: rgba(107, 33, 168, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 18px 34px rgba(17, 24, 39, 0.08);
+  transform: translateY(-3px);
+}
 
 .client-logo-text {
   font-size: 13px; font-weight: 700;
@@ -1483,14 +1523,17 @@ section { padding: 96px 24px; }
 }
 .client-logo-cell:hover .client-logo-text { color: var(--purple); }
 .client-logo-img {
-  max-width: 180px;
-  max-height: 80px;
+  max-width: min(180px, 82%);
+  max-height: 78px;
   width: 100%;
+  height: 78px;
   object-fit: contain;
-  transition: all 0.3s ease;
+  filter: saturate(0.92) contrast(1.02);
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 .client-logo-cell:hover .client-logo-img {
-  transform: scale(1.05);
+  filter: saturate(1.08) contrast(1.04);
+  transform: scale(1.04);
 }
 
 
@@ -2307,7 +2350,7 @@ section { padding: 96px 24px; }
   .outdoor-metric-cell:last-child { border-bottom: none; }
   .outdoor-metric-num { font-size: 22px !important; }
   .clients-logo-grid { grid-template-columns: repeat(2, 1fr); }
-  .client-logo-cell { padding: 22px 12px; }
+  .client-logo-cell { min-height: 138px; padding: 24px 14px 36px; }
   .clients-stats { grid-template-columns: repeat(2, 1fr); }
   .client-stat-cell { padding: 24px 12px; }
   .client-stat-num { font-size: 26px; }
@@ -2359,6 +2402,7 @@ section { padding: 96px 24px; }
   .mockup-table { display: none; }
   .mockup-stat-row { grid-template-columns: 1fr 1fr; gap: 6px; }
   .clients-logo-grid { grid-template-columns: repeat(2, 1fr); }
+  .client-logo-cell { min-height: 128px; }
   .client-stat-num { font-size: 22px; }
   .cta-inner { padding: 32px 16px; border-radius: 14px; }
   .cta-headline { font-size: clamp(22px, 9vw, 30px); }
