@@ -48,8 +48,8 @@
   </script>
 
   <!-- Resource Hints -->
-  <link rel="preload" as="image" href="assets/_c5a1723.jpg" fetchpriority="high" />
-  <link rel="preload" as="video" href="assets/miconsample4.mp4" fetchpriority="low" />
+  <link rel="preload" as="image" href="assets/_c5a1192.webp" fetchpriority="high" />
+  <link rel="preload" as="video" href="assets/new.mp4" type="video/mp4" fetchpriority="high" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -137,16 +137,18 @@
   <div class="hero-video-wrapper" aria-hidden="true">
     <video
       id="hero-video"
+      autoplay
       muted
       playsinline
+      webkit-playsinline
       loop
-      preload="none"
+      preload="auto"
       fetchpriority="high"
       poster="assets/_c5a1192.webp"
       disablepictureinpicture
       disableremoteplayback
     >
-      <source src="assets\new.mp4" type="video/mp4" />
+      <source src="assets/new.mp4" type="video/mp4" />
     </video>
   </div>
   <div id="hero-overlay" aria-hidden="true"></div>

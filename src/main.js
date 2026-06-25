@@ -261,95 +261,31 @@ const style = document.createElement('style');
 style.textContent = `.spin { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }`;
 document.head.appendChild(style);
 // ─── VIDEO LAZY LOAD & AUTOPLAY ON SCROLL ─────────────────────────────────────
-const videoCards = document.querySelectorAll('.video-card');
-videoCards.forEach(card => {
-    const video = card.querySelector('video');
-    if (!video) return;
-    const source = video.querySelector('source');
-    const lazySrc = source ? source.getAttribute('src') : video.getAttribute('src');
-    let loaded = false;
-
-    function lazyLoadVideo() {
-        if (loaded || !lazySrc) return;
-        // Only set src when needed (lazy load)
-        if (source && !video.getAttribute('src')) {
-            // source element already has src, just load
-        } else if (!source) {
-            video.src = lazySrc;
-        }
-        video.load();
-        loaded = true;
-    }
-
-    card.addEventListener('mouseenter', () => {
-        lazyLoadVideo();
-        video.play().catch(() => {});
-    });
-    card.addEventListener('mouseleave', () => {
-        if (!card.classList.contains('in-view')) video.pause();
-    });
-    const scrollObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                card.classList.add('in-view');
-                lazyLoadVideo();
-                video.currentTime = 0;
-                setTimeout(() => { video.play().catch(() => {}); }, 150);
-            } else {
-                card.classList.remove('in-view');
-                video.pause();
-            }
-        });
-    }, { threshold: 0.15, rootMargin: '200px 0px' });
-    scrollObserver.observe(card);
-});
 // ─── HERO VIDEO FADE SYSTEM ───────────────────────────────────────────────────
 const heroVideo = document.getElementById('hero-video');
-let heroFadeFrame = null;
-let heroOpacity = 0;
 
-function setHeroOpacity(value) {
-    heroOpacity = Math.max(0, Math.min(1, value));
-    if (heroVideo) heroVideo.style.opacity = heroOpacity.toString();
-}
-
-function cancelHeroFade() {
-    if (heroFadeFrame) {
-        cancelAnimationFrame(heroFadeFrame);
-        heroFadeFrame = null;
-    }
-}
-
-function heroFadeTo(targetOpacity, duration) {
-    cancelHeroFade();
-    const start = performance.now();
-    const initial = heroOpacity;
-    const delta = targetOpacity - initial;
-
-    function tick(now) {
-        const progress = Math.min(1, (now - start) / duration);
-        setHeroOpacity(initial + delta * progress);
-        if (progress < 1) {
-            heroFadeFrame = requestAnimationFrame(tick);
-        } else {
-            heroFadeFrame = null;
-        }
-    }
-
-    heroFadeFrame = requestAnimationFrame(tick);
+function showHeroVideo() {
+    if (heroVideo) heroVideo.style.opacity = '1';
 }
 
 function heroPlaySequence() {
     if (!heroVideo) return;
-    setHeroOpacity(0);
+    showHeroVideo();
     heroVideo.loop = true;
     heroVideo.play().catch(() => {});
-    heroFadeTo(1, 600);
 }
 
 if (heroVideo) {
-    // Keep video hidden behind poster until ready
-    setHeroOpacity(0);
+    heroVideo.muted = true;
+    heroVideo.defaultMuted = true;
+    heroVideo.loop = true;
+    heroVideo.playsInline = true;
+    heroVideo.setAttribute('muted', '');
+    heroVideo.setAttribute('playsinline', '');
+    heroVideo.setAttribute('webkit-playsinline', '');
+
+    // Keep the poster/video visible even if mobile autoplay is delayed.
+    showHeroVideo();
 
     // Listen for when enough data is loaded to play
     heroVideo.addEventListener('canplay', heroPlaySequence, { once: true });
@@ -369,17 +305,22 @@ if (heroVideo) {
         if ('requestIdleCallback' in window) {
             requestIdleCallback(startVideoLoad, { timeout: 2000 });
         } else {
-            setTimeout(startVideoLoad, 200);
+            startVideoLoad();
         }
     } else {
         window.addEventListener('load', () => {
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(startVideoLoad, { timeout: 2000 });
             } else {
-                setTimeout(startVideoLoad, 200);
+                startVideoLoad();
             }
         }, { once: true });
     }
+
+    window.addEventListener('pageshow', heroPlaySequence);
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) heroPlaySequence();
+    });
 }
 
 // ─── ACTIVE NAV LINK ON SCROLL ───────────────────────────────────────────────
@@ -654,4 +595,3 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
